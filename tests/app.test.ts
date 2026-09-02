@@ -26,7 +26,7 @@ async function startServer() {
 }
 
 describe('HTTP app', () => {
-  it('serves the example landing page', async () => {
+  it('serves the NH FIT employee Copilot demo', async () => {
     const baseUrl = await startServer();
     const response = await fetch(baseUrl);
     const body = await response.text();
@@ -35,10 +35,20 @@ describe('HTTP app', () => {
     expect(response.headers.get('content-type')).toBe('text/html; charset=utf-8');
     expect(response.headers.get('x-content-type-options')).toBe('nosniff');
     expect(response.headers.get('content-security-policy')).toContain("default-src 'none'");
-    expect(body).toContain('<title>AI Frontier — Explore what comes next</title>');
-    expect(body).toContain('Explore the <span>AI frontier.</span>');
-    expect(body).toContain('From signal to evidence.');
-    expect(body).toContain('No tracking · No external assets');
+    expect(body).toContain('<title>NH FIT · 상담 Copilot 데모</title>');
+    expect(body).toContain('DEMO-001');
+    expect(body).toContain('Fake STT');
+    expect(body).toContain('오프라인');
+    expect(body).toContain('POSSIBLE');
+    expect(body).toContain('SUPPORTED');
+    expect(body).toContain('HIGHEST-VALUE CLARIFICATION');
+    expect(body).toContain('활용');
+    expect(body).toContain('나중에');
+    expect(body).toContain('건너뛰기');
+    expect(body).toContain('BURDEN_RELIEF');
+    expect(body).toContain('DEBT_RECOVERY');
+    expect(body).toContain('상품 추천 아님 · 직원 검토 필요');
+    expect(body).toContain('AI는 판단하거나 승인하지 않습니다.');
   });
 
   it('reports health', async () => {
