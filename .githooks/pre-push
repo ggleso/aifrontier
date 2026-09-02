@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -eu
+
+while IFS=' ' read -r _local_ref _local_sha remote_ref _remote_sha; do
+  if [ "$remote_ref" = "refs/heads/main" ]; then
+    echo "Direct pushes to main are blocked. Push a topic branch and merge it through a reviewed pull request." >&2
+    exit 1
+  fi
+done
+
+repo_root=$(git rev-parse --show-toplevel)
+cd "$repo_root"
+
+echo "Running the repository secret scan before push..."
+npm run secrets

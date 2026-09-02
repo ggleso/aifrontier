@@ -19,9 +19,12 @@ A security-first TypeScript and Node.js 26 foundation for AI frontier experiment
 
 ```sh
 npm ci
+npm run hooks:install
 cp .env.example .env
 npm run dev
 ```
+
+Run `npm run hooks:install` once after each clone. It enables the repository's tracked pre-push hook for that clone.
 
 The server binds to `127.0.0.1:3000` by default. Verify it with:
 

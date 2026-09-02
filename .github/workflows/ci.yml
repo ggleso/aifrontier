@@ -10,6 +10,17 @@ permissions:
   pull-requests: read
 
 jobs:
+  main-push-guard:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify main was updated by a merged pull request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/verify-main-push.mjs
+
   quality:
     runs-on: ubuntu-latest
     timeout-minutes: 10
