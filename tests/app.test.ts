@@ -39,6 +39,7 @@ describe('HTTP app', () => {
     expect(body).toContain('DEMO-001');
     expect(body).toContain('Fake STT');
     expect(body).toContain('Browser STT');
+    expect(body).toContain('외부 음성 처리 서비스를 사용할 수 있습니다');
     expect(body).toContain("fetch('/api/analyze'");
     expect(body).toContain('POSSIBLE');
     expect(body).toContain('SUPPORTED');

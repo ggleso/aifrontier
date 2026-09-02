@@ -21,6 +21,79 @@ export interface CopilotProvider {
   analyze(transcript: string): Promise<CopilotAnalysis>;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+export function parseCopilotAnalysis(value: unknown, provider: string): CopilotAnalysis {
+  if (!isRecord(value) || !Array.isArray(value.signals) || !Array.isArray(value.opportunities)) {
+    throw new Error('External provider returned an invalid analysis');
+  }
+  const signals = value.signals.map<Signal>((signal) => {
+    if (
+      !isRecord(signal) ||
+      !isNonEmptyString(signal.code) ||
+      !isNonEmptyString(signal.label) ||
+      (signal.state !== 'POSSIBLE' && signal.state !== 'SUPPORTED') ||
+      typeof signal.confidence !== 'number' ||
+      !Number.isFinite(signal.confidence) ||
+      signal.confidence < 0 ||
+      signal.confidence > 1 ||
+      !isNonEmptyString(signal.evidence)
+    ) {
+      throw new Error('External provider returned an invalid signal');
+    }
+    return {
+      code: signal.code,
+      label: signal.label,
+      state: signal.state,
+      confidence: signal.confidence,
+      evidence: signal.evidence,
+    };
+  });
+  const opportunities = value.opportunities.map((opportunity) => {
+    if (
+      !isRecord(opportunity) ||
+      !isNonEmptyString(opportunity.code) ||
+      !isNonEmptyString(opportunity.label) ||
+      !isNonEmptyString(opportunity.reason)
+    ) {
+      throw new Error('External provider returned an invalid opportunity');
+    }
+    return {
+      code: opportunity.code,
+      label: opportunity.label,
+      reason: opportunity.reason,
+    };
+  });
+  if (
+    !isNonEmptyString(value.clarification) ||
+    !isRecord(value.handoff) ||
+    !isNonEmptyString(value.handoff.intent) ||
+    !isNonEmptyString(value.handoff.facts) ||
+    !isNonEmptyString(value.handoff.verify) ||
+    !isNonEmptyString(value.handoff.nextStep)
+  ) {
+    throw new Error('External provider returned an invalid handoff');
+  }
+  return {
+    provider,
+    signals,
+    clarification: value.clarification,
+    opportunities,
+    handoff: {
+      intent: value.handoff.intent,
+      facts: value.handoff.facts,
+      verify: value.handoff.verify,
+      nextStep: value.handoff.nextStep,
+    },
+  };
+}
+
 const cashflowTerms = ['생활비', '급여', '빠듯', '잔액', '며칠이 비', '병원비'];
 const paymentTerms = ['자동이체', '카드대금', '통신비', '납부', '연체'];
 
@@ -118,7 +191,7 @@ export class OpenAiCompatibleProvider implements CopilotProvider {
     const body = (await response.json()) as { choices?: { message?: { content?: string } }[] };
     const content = body.choices?.[0]?.message?.content;
     if (!content) throw new Error('External provider returned no content');
-    return { ...(JSON.parse(content) as CopilotAnalysis), provider: this.name };
+    return parseCopilotAnalysis(JSON.parse(content) as unknown, this.name);
   }
 }
 

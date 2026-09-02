@@ -94,6 +94,8 @@ export const landingPage = String.raw`<!doctype html>
     document.querySelector('#mic').addEventListener('click', () => {
       const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!Recognition) { document.querySelector('#input-provider').textContent = 'Fake STT fallback'; status.textContent = '이 브라우저는 음성 인식을 지원하지 않아 Fake STT를 사용합니다.'; document.querySelector('#fake-stt').click(); return; }
+      const accepted = window.confirm('브라우저 음성 인식은 브라우저 또는 운영체제 제공자의 외부 음성 처리 서비스를 사용할 수 있습니다. 합성 데이터만 사용하고 계속할까요?');
+      if (!accepted) { status.textContent = '음성 인식을 취소했습니다. 로컬 Fake STT를 사용할 수 있습니다.'; return; }
       const recognition = new Recognition(); recognition.lang = 'ko-KR'; recognition.interimResults = false;
       recognition.onstart = () => { status.textContent = '브라우저 음성 인식 중…'; document.querySelector('#input-provider').textContent = 'Browser STT'; };
       recognition.onresult = (event) => { input.value = event.results[0][0].transcript; status.textContent = '음성 인식 완료. 분석 버튼을 누르세요.'; };
