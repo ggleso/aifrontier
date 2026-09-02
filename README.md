@@ -5,6 +5,7 @@ A security-first TypeScript and Node.js 26 foundation for AI frontier experiment
 ## Current scope
 
 - Local development with npm or Docker/Colima
+- A responsive example landing page at `GET /`
 - A minimal HTTP health endpoint at `GET /health`
 - No deployment target
 - No external API or service integration
@@ -26,11 +27,16 @@ npm run dev
 
 Run `npm run hooks:install` once after each clone. It enables the repository's tracked pre-push hook for that clone.
 
-The server binds to `127.0.0.1:3000` by default. Verify it with:
+The server binds to `127.0.0.1:3000` by default. Open the example page at
+<http://127.0.0.1:3000/> or verify both routes with:
 
 ```sh
+curl -sS -D - -o /dev/null http://127.0.0.1:3000/
 curl http://127.0.0.1:3000/health
 ```
+
+The landing page uses only repository-native HTML and CSS. It does not load
+external fonts, images, scripts, analytics, APIs, or AI models.
 
 ## Quality checks
 

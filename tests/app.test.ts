@@ -26,6 +26,21 @@ async function startServer() {
 }
 
 describe('HTTP app', () => {
+  it('serves the example landing page', async () => {
+    const baseUrl = await startServer();
+    const response = await fetch(baseUrl);
+    const body = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toBe('text/html; charset=utf-8');
+    expect(response.headers.get('x-content-type-options')).toBe('nosniff');
+    expect(response.headers.get('content-security-policy')).toContain("default-src 'none'");
+    expect(body).toContain('<title>AI Frontier — Explore what comes next</title>');
+    expect(body).toContain('Explore the <span>AI frontier.</span>');
+    expect(body).toContain('From signal to evidence.');
+    expect(body).toContain('No tracking · No external assets');
+  });
+
   it('reports health', async () => {
     const baseUrl = await startServer();
     const response = await fetch(`${baseUrl}/health`);
