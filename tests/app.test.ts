@@ -38,8 +38,20 @@ describe('HTTP app', () => {
     expect(body).toContain('<title>NH FIT · 상담 Copilot 데모</title>');
     expect(body).toContain('DEMO-001');
     expect(body).toContain('Fake STT');
-    expect(body).toContain('Browser STT');
+    expect(body).toContain('Browser STT · 연속');
     expect(body).toContain('외부 음성 처리 서비스를 사용할 수 있습니다');
+    expect(body).toContain('id="speaker"');
+    expect(body).toContain('id="mic-start"');
+    expect(body).toContain('id="mic-pause"');
+    expect(body).toContain('id="mic-stop"');
+    expect(body).toContain('recognition.continuous = true');
+    expect(body).toContain('setTimeout(startRecognition, 250)');
+    expect(body).toContain(
+      "setTimeout(() => analyzeTranscript(customerTranscript.join(' ')), 900)",
+    );
+    expect(body).toContain("if (role === '고객')");
+    expect(body).toContain('상담 음성 인식을 일시정지했습니다');
+    expect(body).toContain('상담 음성 인식을 종료했습니다');
     expect(body).toContain("fetch('/api/analyze'");
     expect(body).toContain('POSSIBLE');
     expect(body).toContain('SUPPORTED');
