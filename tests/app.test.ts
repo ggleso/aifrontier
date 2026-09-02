@@ -38,7 +38,8 @@ describe('HTTP app', () => {
     expect(body).toContain('<title>NH FIT · 상담 Copilot 데모</title>');
     expect(body).toContain('DEMO-001');
     expect(body).toContain('Fake STT');
-    expect(body).toContain('오프라인');
+    expect(body).toContain('Browser STT');
+    expect(body).toContain("fetch('/api/analyze'");
     expect(body).toContain('POSSIBLE');
     expect(body).toContain('SUPPORTED');
     expect(body).toContain('HIGHEST-VALUE CLARIFICATION');
@@ -56,8 +57,38 @@ describe('HTTP app', () => {
     const response = await fetch(`${baseUrl}/health`);
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ status: 'ok', service: 'aifrontier' });
+    expect(await response.json()).toEqual({
+      status: 'ok',
+      service: 'aifrontier',
+      provider: 'local-rules',
+    });
     expect(response.headers.get('cache-control')).toBe('no-store');
+  });
+
+  it('analyzes a transcript with the offline provider', async () => {
+    const baseUrl = await startServer();
+    const response = await fetch(`${baseUrl}/api/analyze`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ transcript: '급여일 전에 카드대금 납부가 걱정돼요.' }),
+    });
+    const body = (await response.json()) as { provider: string; signals: { code: string }[] };
+
+    expect(response.status).toBe(200);
+    expect(body.provider).toBe('local-rules');
+    expect(body.signals.map((signal) => signal.code)).toEqual(['CASHFLOW_GAP', 'PAYMENT_BURDEN']);
+  });
+
+  it('rejects an empty transcript', async () => {
+    const baseUrl = await startServer();
+    const response = await fetch(`${baseUrl}/api/analyze`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ transcript: ' ' }),
+    });
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ error: 'transcript_required' });
   });
 
   it('returns JSON for unknown routes', async () => {
