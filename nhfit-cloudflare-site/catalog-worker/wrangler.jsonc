@@ -1,0 +1,14 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "aifrontier-catalog-sync",
+  "main": "index.ts",
+  "compatibility_date": "2026-09-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "triggers": { "crons": ["0 1 * * *"] },
+  "kv_namespaces": [
+    {
+      "binding": "PRODUCT_CATALOG",
+      "id": "5e41bdf52995496db3e6affbd0208553"
+    }
+  ]
+}

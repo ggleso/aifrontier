@@ -6,6 +6,7 @@ import {
   type FinancialProduct,
 } from '../src/product-catalog.js';
 import { renderProductCatalogPage } from '../src/product-catalog-page.js';
+import { extractKinfaLinks, parseKinfaProduct } from '../src/kinfa-crawler.js';
 
 const product = (rateOrFee = '연 3%'): FinancialProduct => ({
   id: 'p1',
@@ -67,5 +68,22 @@ describe('product catalog lifecycle', () => {
     expect(html).toContain('공식 출처');
     expect(html).toContain('발표');
     expect(html).toContain('시행');
+  });
+  it('discovers official detail links and extracts qualification fields', () => {
+    const links = extractKinfaLinks(
+      '<p data-menuurl="/financialProduct/demo.do"><span>테스트 대출</span></p>',
+    );
+    expect(links).toEqual([
+      { name: '테스트 대출', url: 'https://www.kinfa.or.kr/financialProduct/demo.do' },
+    ]);
+    const parsed = parseKinfaProduct(
+      links[0]!,
+      '<h2>지원대상</h2><p>연소득 4천만원 이하</p><h2>대출한도</h2><p>최대 1천만원</p><h2>대출금리</h2><p>연 5%</p><h2>상환방법</h2><p>원리금균등분할</p><h2>신청방법</h2><p>앱 신청</p>',
+      '2026-09-15',
+    );
+    expect(parsed.audience).toContain('연소득 4천만원 이하');
+    expect(parsed.limit).toContain('최대 1천만원');
+    expect(parsed.rateOrFee).toContain('연 5%');
+    expect(parsed.repayment).toContain('원리금균등분할');
   });
 });

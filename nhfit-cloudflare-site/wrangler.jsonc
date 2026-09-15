@@ -2,16 +2,35 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "nhfit-cloudflare-site",
   "compatibility_date": "2026-09-02",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   "main": "vinext/server/fetch-handler",
   "assets": {
     "directory": "dist/client",
     "not_found_handling": "none",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
   },
   "cache": {
-    "enabled": true
-  }
+    "enabled": true,
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "SPEECH_BUDGET",
+        "class_name": "SpeechBudget",
+        "script_name": "aifrontier-speech",
+      },
+    ],
+  },
+  "services": [
+    {
+      "binding": "SPEECH_SERVICE",
+      "service": "aifrontier-speech",
+    },
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "PRODUCT_CATALOG",
+      "id": "5e41bdf52995496db3e6affbd0208553",
+    },
+  ],
 }
